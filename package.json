@@ -1,0 +1,46 @@
+{
+  "name": "example-with-tailwindcss",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "preview": "vinxi preview",
+    "fix": "biome check . --write --unsafe",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "db:clear": "docker-compose down -v",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@ark-ui/solid": "^5.15.1",
+    "@auth/core": "^0.40.0",
+    "@auth/drizzle-adapter": "^1.10.0",
+    "@fontsource/inter": "^5.2.6",
+    "@kobalte/core": "^0.13.10",
+    "@modular-forms/solid": "^0.25.1",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@solidjs/router": "^0.15.0",
+    "@solidjs/start": "^1.1.0",
+    "@tabler/icons-webfont": "^3.34.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.44.2",
+    "minio": "^8.0.5",
+    "pg": "^8.16.2",
+    "solid-js": "^1.9.5",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "vinxi": "^0.5.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.4",
+    "@tailwindcss/vite": "^4.0.7",
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.2",
+    "tailwindcss": "^4.0.7"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
