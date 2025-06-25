@@ -1,6 +1,6 @@
-import { cn } from "@/lib/cn";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { JSX } from "solid-js";
+import { cn } from "@/lib/cn";
 import { tablerIcons } from "./tablerIcons";
 
 const variants = cva(

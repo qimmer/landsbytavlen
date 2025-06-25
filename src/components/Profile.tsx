@@ -1,5 +1,6 @@
-import { createResource, Show } from "solid-js";
-import { login } from "~/lib/auth";
+import { createAsync } from "@solidjs/router";
+import { Show } from "solid-js";
+import { login } from "~/lib/login";
 import { getSession } from "~/server/getSession";
 import { t } from "~/t";
 import { Button } from "./ui/button";
@@ -12,7 +13,7 @@ import {
 import { Icon } from "./ui/icon";
 
 export default function Profile() {
-  const [session] = createResource(() => getSession());
+  const session = createAsync(() => getSession());
 
   return (
     <Show
@@ -62,7 +63,7 @@ export default function Profile() {
         <DropdownMenu>
           <DropdownMenuTrigger as={Button} variant="default">
             <Icon iconId="user" />
-            {user().name}
+            {JSON.stringify(user())}
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>

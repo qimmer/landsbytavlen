@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -10,12 +9,48 @@
     "jsxImportSource": "solid-js",
     "allowJs": true,
     "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
     "strict": true,
-    "types": ["vinxi/types/client"],
+    "types": [
+      "vinxi/types/client",
+      "vite-plugin-solid-svg/types-component-solid",
+      "vite-plugin-solid-svg/types",
+      "vite/client"
+    ],
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"],
-      "@/*": ["./src/*"]
-    }
-  }
+      "~/*": [
+        "./src/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "ts-plugin-sort-import-suggestions",
+        // Matches `@/`, `../` and `./`, move them up in the suggestions (This is the default config if you leave it empty)
+        "moveUpPatterns": [
+          "@/",
+          "lodash-es",
+          "\\.{1,2}/"
+        ],
+        // Move `dist` down in the suggestions, by deafult it's `[]`
+        "moveDownPatterns": [
+          "dist",
+          "node_modules",
+          "@kobalte"
+        ],
+      }
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    ".output",
+    ".vinxi",
+    "dist",
+    "db",
+    "app.config.ts"
+  ]
 }

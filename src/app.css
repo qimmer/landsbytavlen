@@ -11,9 +11,18 @@
 
 @config "../tailwind.config.cjs";
 
+@theme {
+  --default-ring-width: 1px;
+  --default-ring-color: hsl(var(--accent));
+
+  --shadow-glow: 0 0 5px hsl(var(--accent));
+}
+
 @utility container {
   padding-inline: 2rem;
   margin-inline: auto;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 @layer base {
@@ -23,6 +32,26 @@
   ::backdrop,
   ::file-selector-button {
     border-color: hsl(var(--border));
+  }
+
+  #portals {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100dvw;
+    height: 100dvh;
+    max-width: 100dvw;
+    max-height: 100dvh;
+    pointer-events: none;
+    touch-action: none;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  #portals > * {
+    pointer-events: all;
+    touch-action: auto;
+    user-select: auto;
   }
 
   :root {
@@ -44,8 +73,8 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 0 84.2% 60.2%;
+    --accent-foreground: 222.2 47.4% 99%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;

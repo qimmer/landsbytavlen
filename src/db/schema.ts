@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   boolean,
+  geometry,
   index,
   integer,
   pgTable,
@@ -14,9 +15,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-const foreignId = () => varchar({ length: 32 });
+const foreignId = () => varchar({ length: 64 });
 const id = () =>
-  varchar({ length: 32 })
+  varchar({ length: 64 })
     .primaryKey()
     .$defaultFn(() => createId());
 
@@ -25,19 +26,22 @@ export const events = pgTable(
   {
     id: id(),
     title: text().notNull(),
+    description: text().notNull(),
     location: text().notNull(),
-    start: timestamp({ withTimezone: true, mode: "date" }),
-    end: timestamp({ withTimezone: true, mode: "date" }),
-    createdBy: foreignId().references(() => organizations.id, {
-      onDelete: "cascade",
-    }),
-    createdAt: timestamp({ withTimezone: true, mode: "date" }),
+    start: timestamp({ withTimezone: true, mode: "date" }).notNull(),
+    end: timestamp({ withTimezone: true, mode: "date" }).notNull(),
+    createdBy: foreignId()
+      .references(() => organizations.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: "date" }).notNull(),
     deletedAt: timestamp({ withTimezone: true, mode: "date" }),
     updatedAt: timestamp({ withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
-    tags: varchar({ length: 32 }).array().notNull(),
+    tags: varchar({ length: 64 }).array().notNull(),
   },
   (table) => [
     index("events_title_search_index").using(
@@ -104,6 +108,13 @@ export const images = pgTable(
   ],
 );
 
+export const towns = pgTable("towns", {
+  id: id(),
+  name: varchar({ length: 64 }).notNull(),
+  municipality: varchar({ length: 64 }).notNull(),
+  location: geometry({ type: "point", mode: "tuple", srid: 4326 }).notNull(),
+});
+
 export const users = pgTable(
   "users",
   {
@@ -119,12 +130,49 @@ export const users = pgTable(
   (table) => [unique().on(table.email)],
 );
 
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    userId: foreignId()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    townId: foreignId()
+      .notNull()
+      .references(() => towns.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.townId] })],
+);
+
+export const mutes = pgTable(
+  "mutes",
+  {
+    userId: foreignId()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    organizationId: foreignId()
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.organizationId] })],
+);
+
 export const organizations = pgTable("organizations", {
   id: id(),
   vatId: foreignId().notNull().default(""),
   name: text().notNull(),
-  email: text().notNull(),
-  imageUrl: text().notNull(),
+  address: text().notNull(),
+  isCharity: boolean().notNull(),
+  postCode: varchar({ length: 4 }).notNull(),
+  townId: foreignId().references(() => towns.id, { onDelete: "set null" }),
+  createdBy: foreignId().references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  createdAt: timestamp({ withTimezone: true, mode: "date" }),
+  deletedAt: timestamp({ withTimezone: true, mode: "date" }),
+  updatedAt: timestamp({ withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const roles = pgTable(
