@@ -130,14 +130,14 @@ export default () => {
                     {(titleSection, i) => (
                       <h1
                         data-index={i()}
-                        class="text-6xl font-bold tracking-tighter data-[index=1]:text-accent data-[index=1]:text-7xl"
+                        class="text-4xl font-bold tracking-tighter data-[index=1]:text-accent data-[index=1]:text-6xl"
                       >
                         {titleSection}
                       </h1>
                     )}
                   </For>
                 </div>
-                <h2 class="text-4xl font-semibold tracking-tighter">
+                <h2 class="text-3xl font-semibold tracking-tighter">
                   {t.heroSubTitle}
                 </h2>
                 <div>
