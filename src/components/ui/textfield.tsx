@@ -9,7 +9,7 @@ import type {
 import { TextField as TextFieldPrimitive } from "@kobalte/core/text-field";
 import { cva } from "class-variance-authority";
 import type { ValidComponent, VoidProps } from "solid-js";
-import { splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 import { cn } from "@/lib/cn";
 
 type textFieldProps<T extends ValidComponent = "div"> =
@@ -48,6 +48,7 @@ export const textfieldLabel = cva(
 type textFieldLabelProps<T extends ValidComponent = "label"> =
   TextFieldLabelProps<T> & {
     class?: string;
+    required?: boolean;
   };
 
 export const TextFieldLabel = <T extends ValidComponent = "label">(
@@ -59,7 +60,12 @@ export const TextFieldLabel = <T extends ValidComponent = "label">(
     <TextFieldPrimitive.Label
       class={cn(textfieldLabel(), local.class)}
       {...rest}
-    />
+    >
+      <Show when={props.required}>
+        <div class="inline-block mr-1 text-destructive">*</div>
+      </Show>
+      {props.children}
+    </TextFieldPrimitive.Label>
   );
 };
 

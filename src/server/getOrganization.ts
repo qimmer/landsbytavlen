@@ -8,5 +8,16 @@ export const getOrganization = query(async (id: string) => {
 
   return await db.query.organizations.findFirst({
     where: eq(organizations.id, id),
+    with: {
+      town: {
+        columns: {
+          id: true,
+          municipality: true,
+          name: true
+        }
+      }
+    }
   });
 }, "getOrganization");
+
+

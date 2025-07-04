@@ -1,12 +1,11 @@
+import type { AuthConfig } from "@auth/core";
 import Facebook from "@auth/core/providers/facebook";
 import Google from "@auth/core/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import type { SolidAuthConfig } from "@auth/solid-start";
 import { eq } from "drizzle-orm";
 import {
   accounts,
   authenticators,
-  roles,
   sessions,
   users,
   verificationTokens,
@@ -14,7 +13,7 @@ import {
 import type { SessionData } from "~/server/getSession";
 import { db } from "../db";
 
-export const authConfig: SolidAuthConfig = {
+export const authConfig: AuthConfig = {
   basePath: "/api/auth",
   debug: process.env.NODE_ENV !== "production",
   secret: process.env.AUTH_SECRET,
@@ -42,16 +41,20 @@ export const authConfig: SolidAuthConfig = {
         return { ...session };
       }
 
-      const [{ users: dbUser, roles: dbRole }] = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .leftJoin(roles, eq(users.currentRoleId, roles.id));
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.email, user.email),
+        with: {
+          currentRole: {
+            with: {
+              organization: true,
+            },
+          },
+        },
+      });
 
       const sessionWithUser = {
         ...session,
         user: { ...session.user, ...dbUser },
-        role: dbRole,
       } as SessionData;
 
       return sessionWithUser;

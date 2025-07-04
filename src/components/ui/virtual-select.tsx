@@ -5,7 +5,6 @@ import type {
 } from "@kobalte/core/popover";
 import { VirtualList } from "@solid-primitives/virtual";
 import {
-  type Accessor,
   createContext,
   createSignal,
   type JSX,
@@ -82,11 +81,13 @@ export function VirtualSelectTrigger<T extends ValidComponent = "button">(
 
   return (
     <PopoverTrigger {...props}>
-      {context.optionTitle(
-        context
-          .options()
-          .find((x) => context.optionValue(x) === context.value()),
-      )}
+      {context.value()
+        ? context.optionTitle(
+            context
+              .options()
+              .find((x) => context.optionValue(x) === context.value()),
+          )
+        : props.children}
     </PopoverTrigger>
   );
 }
@@ -143,7 +144,7 @@ function VirtualSelectItem(
       )}
       type="button"
       class={cn(
-        "w-full bg-transparent border-none p-2 cursor-pointer rounded hover:bg-popover",
+        "w-full bg-transparent border-none p-2 cursor-pointer rounded hover:bg-popover overflow-hidden",
         props.class,
       )}
     >

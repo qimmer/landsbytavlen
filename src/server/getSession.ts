@@ -2,19 +2,31 @@ import { Auth } from "@auth/core";
 import { query } from "@solidjs/router";
 import type { InferSelectModel } from "drizzle-orm";
 import { getRequestEvent } from "solid-js/web";
-import type { roles, users } from "~/db/schema";
+import type { organizations, roles, users } from "~/db/schema";
 import type { Session } from "~/routes/api/auth/[...auth]";
 
 export type SessionData = Session & {
-  role?: InferSelectModel<typeof roles>;
+  user?: InferSelectModel<typeof users> & {
+    currentRole?: InferSelectModel<typeof roles> & {
+      organization: InferSelectModel<typeof organizations>;
+    };
+  };
 };
 
 export type SessionDataWithRole = SessionData & {
-  role: InferSelectModel<typeof roles>;
+  user: InferSelectModel<typeof users> & {
+    currentRole: InferSelectModel<typeof roles> & {
+      organization: InferSelectModel<typeof organizations>;
+    };
+  };
 };
 
 export type SessionDataWithUser = SessionData & {
-  user: InferSelectModel<typeof users>;
+  user: InferSelectModel<typeof users> & {
+    currentRole?: InferSelectModel<typeof roles> & {
+      organization: InferSelectModel<typeof organizations>;
+    };
+  };
 };
 type GetSession = {
   (options?: { withRole?: false; withUser?: false }): Promise<SessionData>;
@@ -27,6 +39,7 @@ type GetSession = {
     withRole: true;
     withUser: true;
   }): Promise<SessionDataWithRole & SessionDataWithUser>;
+  key: string;
 };
 export const getSession = query(
   async (options?: { withRole?: boolean; withUser?: boolean }) => {
@@ -53,7 +66,7 @@ export const getSession = query(
       authConfig,
     );
 
-    const data = await response.json();
+    const data = (await response.json()) as SessionData;
 
     if (!data || !Object.keys(data).length || response.status !== 200) {
       if (options?.withUser) {
@@ -67,7 +80,7 @@ export const getSession = query(
 
     const session = data as SessionData;
 
-    if (options?.withRole && !session.role) {
+    if (options?.withRole && !session.user?.currentRole) {
       throw new Error("Needs to be logged in as organization.");
     }
     if (options?.withUser && !session.user) {

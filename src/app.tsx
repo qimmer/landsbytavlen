@@ -16,7 +16,7 @@ export default function App() {
           <Suspense>
             <div class="flex flex-col flex-1 items-stretch">
               <Nav />
-              <div class="flex flex-col flex-1 items-stretch">
+              <div class="flex flex-col flex-1 items-stretch relative">
                 {props.children}
               </div>
               <Footer />

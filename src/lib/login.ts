@@ -1,3 +1,8 @@
+import { revalidate } from "@solidjs/router";
+import { getOrganizationRoles } from "~/server/getOrganizationRoles";
+import { getRoles } from "~/server/getRoles";
+import { getSession } from "~/server/getSession";
+
 export async function login(
   provider: "facebook" | "microsoft" | "credentials" | "google" | "twitch",
   config?: {
@@ -27,6 +32,8 @@ export async function login(
   const data = await res.clone().json();
 
   const url = data.url ?? data.redirect ?? config?.logoutReturnUrl ?? "/";
+
+  revalidate([getSession.key, getRoles.key, getOrganizationRoles.key]);
 
   window.location.href = url;
   // If url contains a hash, the browser does not reload the page. We reload manually

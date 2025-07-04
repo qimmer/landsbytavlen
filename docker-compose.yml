@@ -4,7 +4,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: db.dockerfile
     environment:
       POSTGRES_USER: landsby
       POSTGRES_PASSWORD: landsby-appen
@@ -42,6 +42,18 @@ services:
       mc policy set public local/bucket
       "
     restart: "no"
+  app:
+    build:
+      context: .
+      dockerfile: app.dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://landsby:landsby-appen@db:5432/landsby
+    depends_on:
+      - db
+      - s3
+      - s3-mc
 volumes:
   db_data:
   s3_data:

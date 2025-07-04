@@ -1,17 +1,27 @@
-import { useSearchParams } from "@solidjs/router";
-import { createSignal, Show } from "solid-js";
+import { createAsync, useNavigate, useSearchParams } from "@solidjs/router";
+import { createEffect, Show } from "solid-js";
 import { Logo } from "~/components/Logo";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { login } from "~/lib/login";
+import { getSession } from "~/server/getSession";
 import { t } from "~/t";
 
 export default () => {
   const [{ error, returnUrl }] = useSearchParams();
   const errorText = () =>
     error ? (t[error as keyof typeof t] as string) : undefined;
+
+  const session = createAsync(() => getSession());
+  const navigate = useNavigate();
+
+  createEffect(() => {
+    if (session()?.user?.id) {
+      navigate((returnUrl as string) || "/", { replace: true });
+    }
+  });
 
   return (
     <div class="bg-background text-foreground flex flex-col items-center py-8 px-2 gap-16 min-h-full justify-center">

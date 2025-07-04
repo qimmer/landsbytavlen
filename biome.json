@@ -6,7 +6,8 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "includes": ["src/**/*.ts", "src/**/*.tsx"]
   },
   "formatter": {
     "enabled": true,
@@ -22,6 +23,9 @@
       },
       "style": {
         "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
       }
     }
   },

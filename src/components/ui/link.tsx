@@ -32,6 +32,7 @@ export const Link = <T extends ValidComponent = typeof A>(
           variant: local.variant ?? "link",
           size: local.size ?? "default",
         }),
+        "justify-start",
         local.class,
       )}
       {...rest}

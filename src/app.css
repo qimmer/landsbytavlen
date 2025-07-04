@@ -9,6 +9,8 @@
 @import "@fontsource/inter/800.css";
 @import "@fontsource/inter/900.css";
 
+@plugin "@tailwindcss/typography";
+
 @config "../tailwind.config.cjs";
 
 @theme {
@@ -19,10 +21,10 @@
 }
 
 @utility container {
-  padding-inline: 2rem;
+  padding-inline: 1rem;
   margin-inline: auto;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 @layer base {
@@ -139,8 +141,6 @@
   font-family: "tabler-icons";
   font-style: normal;
   font-weight: 200;
-  -webkit-font-smoothing: none;
-  transform: rotateZ(0);
   text-rendering: optimizeSpeed;
   src:
     url("../node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.woff2")
@@ -149,4 +149,14 @@
     format("woff"),
     url("../node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.ttf")
     format("truetype");
+}
+
+@font-face {
+  font-family: "Skilteskrift";
+  font-style: normal;
+  font-weight: 200;
+  text-rendering: optimizeSpeed;
+  src:
+    url("/byskilt.woff")
+    format("woff"),
 }

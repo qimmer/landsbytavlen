@@ -1,6 +1,6 @@
 import type { AdapterAccountType } from "@auth/core/adapters";
 import { createId } from "@paralleldrive/cuid2";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   boolean,
@@ -30,6 +30,11 @@ export const events = pgTable(
     location: text().notNull(),
     start: timestamp({ withTimezone: true, mode: "date" }).notNull(),
     end: timestamp({ withTimezone: true, mode: "date" }).notNull(),
+    images: text()
+      .array()
+      .notNull()
+      .default([]),
+    coverImageId: foreignId(),
     createdBy: foreignId()
       .references(() => organizations.id, {
         onDelete: "cascade",
@@ -41,14 +46,12 @@ export const events = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
-    tags: varchar({ length: 64 }).array().notNull(),
   },
   (table) => [
     index("events_title_search_index").using(
       "gin",
       sql`to_tsvector('english', ${table.title})`,
     ),
-    index("events_tags").using("gin", table.tags),
     index("events_deleted_null_idx")
       .on(table.id)
       .where(sql`${table.deletedAt} IS NULL`),
@@ -92,20 +95,16 @@ export const images = pgTable(
   "images",
   {
     id: id(),
-    title: text().notNull(),
-    createdAt: timestamp({ withTimezone: true, mode: "date" }),
-    deletedAt: timestamp({ withTimezone: true, mode: "date" }),
-    updatedAt: timestamp({ withTimezone: true, mode: "date" })
+    createdBy: foreignId().references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
+    fileName: text().notNull(),
+    mimeType: text().notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: "date" })
       .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
+      .defaultNow(),
   },
-  (table) => [
-    index("images_deleted_null_idx")
-      .on(table.id)
-      .where(sql`${table.deletedAt} IS NULL`),
-    index("images_updated_at_idx").on(table.updatedAt),
-  ],
+  (table) => [index("images_created_at_idx").on(table.createdAt)],
 );
 
 export const towns = pgTable("towns", {
@@ -156,24 +155,37 @@ export const mutes = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.organizationId] })],
 );
 
-export const organizations = pgTable("organizations", {
-  id: id(),
-  vatId: foreignId().notNull().default(""),
-  name: text().notNull(),
-  address: text().notNull(),
-  isCharity: boolean().notNull(),
-  postCode: varchar({ length: 4 }).notNull(),
-  townId: foreignId().references(() => towns.id, { onDelete: "set null" }),
-  createdBy: foreignId().references(() => users.id, {
-    onDelete: "cascade",
-  }),
-  createdAt: timestamp({ withTimezone: true, mode: "date" }),
-  deletedAt: timestamp({ withTimezone: true, mode: "date" }),
-  updatedAt: timestamp({ withTimezone: true, mode: "date" })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: id(),
+    vatId: foreignId().notNull().default(""),
+    name: text().notNull(),
+    phone: text(),
+    presentation: text().notNull().default(""),
+    address: text().notNull(),
+    isCharity: boolean().notNull(),
+    postCode: varchar({ length: 4 }).notNull(),
+    townId: foreignId()
+      .notNull()
+      .references(() => towns.id, { onDelete: "cascade" }),
+    imageId: foreignId(),
+    presentationImages: text()
+      .array()
+      .notNull()
+      .default([]),
+    createdBy: foreignId().references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    createdAt: timestamp({ withTimezone: true, mode: "date" }),
+    deletedAt: timestamp({ withTimezone: true, mode: "date" }),
+    updatedAt: timestamp({ withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [unique().on(table.vatId)],
+);
 
 export const roles = pgTable(
   "roles",
@@ -266,3 +278,50 @@ export const authenticators = pgTable(
     },
   ],
 );
+
+export const rolesRelations = relations(roles, ({ one }) => ({
+  user: one(users, {
+    fields: [roles.userId],
+    references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [roles.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+export const usersRelations = relations(users, ({ one }) => ({
+  currentRole: one(roles, {
+    fields: [users.currentRoleId],
+    references: [roles.id],
+  }),
+}));
+
+export const organizationRelations = relations(organizations, ({ one }) => ({
+  town: one(towns, {
+    fields: [organizations.townId],
+    references: [towns.id],
+  }),
+}));
+
+export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
+  town: one(towns, {
+    fields: [subscriptions.townId],
+    references: [towns.id],
+  }),
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const eventRelations = relations(events, ({ one, many }) => ({
+  createdByOrg: one(organizations, {
+    fields: [events.createdBy],
+    references: [organizations.id],
+  }),
+  coverImage: one(images, {
+    fields: [events.coverImageId],
+    references: [images.id],
+  }),
+}));

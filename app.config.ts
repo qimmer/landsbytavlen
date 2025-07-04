@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+  ssr: false,
   vite: {
     ssr: { external: ["drizzle-orm"] },
     plugins: [
