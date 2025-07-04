@@ -119,6 +119,7 @@ export default () => {
                 autoplay
                 playsinline
                 muted
+                loop
                 class="block w-[calc(100%+4px)] h-[calc(100%+4px)] -m-[2px] object-cover rounded-xl min-h-[50dvh]"
               />
             </div>
