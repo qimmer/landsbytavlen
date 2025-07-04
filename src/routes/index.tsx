@@ -152,7 +152,7 @@ export default () => {
                 </div>
               </div>
               <div
-                class="relative flex-1 min-h-[60dvh]"
+                class="hidden md:flex relative flex-1 min-h-[60dvh]"
                 ref={(el) => {
                   containerRef = el;
                 }}
