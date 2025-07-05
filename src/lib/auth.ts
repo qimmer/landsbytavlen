@@ -18,6 +18,7 @@ export const authConfig: AuthConfig = {
   debug: process.env.NODE_ENV !== "production",
   secret: process.env.AUTH_SECRET,
   adapter: DrizzleAdapter(db, {
+
     accountsTable: accounts,
     usersTable: users,
     authenticatorsTable: authenticators,

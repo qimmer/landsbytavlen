@@ -7,7 +7,7 @@ import {
   geometry,
   index,
   integer,
-  pgTable,
+  pgSchema,
   primaryKey,
   text,
   timestamp,
@@ -15,13 +15,15 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+const drizzleSchema = pgSchema("drizzle");
+
 const foreignId = () => varchar({ length: 64 });
 const id = () =>
   varchar({ length: 64 })
     .primaryKey()
     .$defaultFn(() => createId());
 
-export const events = pgTable(
+export const events = drizzleSchema.table(
   "events",
   {
     id: id(),
@@ -59,7 +61,7 @@ export const events = pgTable(
   ],
 );
 
-export const posts = pgTable(
+export const posts = drizzleSchema.table(
   "posts",
   {
     id: id(),
@@ -91,7 +93,7 @@ export const posts = pgTable(
   ],
 );
 
-export const images = pgTable(
+export const images = drizzleSchema.table(
   "images",
   {
     id: id(),
@@ -107,14 +109,14 @@ export const images = pgTable(
   (table) => [index("images_created_at_idx").on(table.createdAt)],
 );
 
-export const towns = pgTable("towns", {
+export const towns = drizzleSchema.table("towns", {
   id: id(),
   name: varchar({ length: 64 }).notNull(),
   municipality: varchar({ length: 64 }).notNull(),
   location: geometry({ type: "point", mode: "tuple", srid: 4326 }).notNull(),
 });
 
-export const users = pgTable(
+export const users = drizzleSchema.table(
   "users",
   {
     id: id(),
@@ -129,7 +131,7 @@ export const users = pgTable(
   (table) => [unique().on(table.email)],
 );
 
-export const subscriptions = pgTable(
+export const subscriptions = drizzleSchema.table(
   "subscriptions",
   {
     userId: foreignId()
@@ -142,7 +144,7 @@ export const subscriptions = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.townId] })],
 );
 
-export const mutes = pgTable(
+export const mutes = drizzleSchema.table(
   "mutes",
   {
     userId: foreignId()
@@ -155,7 +157,7 @@ export const mutes = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.organizationId] })],
 );
 
-export const organizations = pgTable(
+export const organizations = drizzleSchema.table(
   "organizations",
   {
     id: id(),
@@ -187,7 +189,7 @@ export const organizations = pgTable(
   (table) => [unique().on(table.vatId)],
 );
 
-export const roles = pgTable(
+export const roles = drizzleSchema.table(
   "roles",
   {
     id: id(),
@@ -206,7 +208,7 @@ export const roles = pgTable(
   (table) => [unique().on(table.userId, table.organizationId)],
 );
 
-export const accounts = pgTable(
+export const accounts = drizzleSchema.table(
   "accounts",
   {
     userId: text("userId")
@@ -232,7 +234,7 @@ export const accounts = pgTable(
   ],
 );
 
-export const verificationTokens = pgTable(
+export const verificationTokens = drizzleSchema.table(
   "verificationTokens",
   {
     identifier: text("identifier").notNull(),
@@ -248,7 +250,7 @@ export const verificationTokens = pgTable(
   ],
 );
 
-export const sessions = pgTable("sessions", {
+export const sessions = drizzleSchema.table("sessions", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
     .notNull()
@@ -256,7 +258,7 @@ export const sessions = pgTable("sessions", {
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
 
-export const authenticators = pgTable(
+export const authenticators = drizzleSchema.table(
   "authenticators",
   {
     credentialID: text("credentialID").notNull().unique(),
