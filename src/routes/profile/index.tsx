@@ -1,6 +1,7 @@
 import { createAsync, useAction, useNavigate } from "@solidjs/router";
 import { createSignal, For, Show } from "solid-js";
 import { LoginGuard } from "~/components/LoginGuard";
+import { TownSelect } from "~/components/TownSelect";
 import { Button } from "~/components/ui/button";
 import { Icon } from "~/components/ui/icon";
 import { TownSign } from "~/components/ui/town-sign";
@@ -23,7 +24,6 @@ export default () => {
   const navigate = useNavigate();
   const session = createAsync(() => getSession());
   const roles = createAsync(() => getRoles());
-  const myTowns = createAsync(() => getTowns());
   const mySubscriptions = createAsync(() => getSubscriptions());
   const addSubscriptionAction = useAction(addSubscription);
   const removeSubscriptionAction = useAction(removeSubscription);
@@ -108,36 +108,9 @@ export default () => {
                         </>
                       )}
                     </For>
-                    <VirtualSelect
-                      value=""
-                      onChange={(townId) =>
-                        townId && addSubscriptionAction(townId)
-                      }
-                      options={myTowns() ?? []}
-                      height={400}
-                      rowHeight={32}
-                      optionTitle={(x) => (
-                        <div class="flex items-center gap-2 justify-between max-w-full w-full overflow-hidden">
-                          <span class="truncate basis-full text-start">
-                            {x?.name ?? ""}
-                          </span>
-                          <span class="truncate basis-full text-muted-foreground text-end">
-                            {x?.municipality ?? ""}
-                          </span>
-                        </div>
-                      )}
-                      optionValue={(x) => x?.id}
-                    >
-                      <VirtualSelectTrigger
-                        as={Button}
-                        variant="outline"
-                        class="flex items-center w-full col-span-3"
-                      >
-                        {t.chooseTowns}...
-                      </VirtualSelectTrigger>
 
-                      <VirtualSelectContent />
-                    </VirtualSelect>
+                    <div />
+                    <TownSelect class="col-span-2" placeholder={`${t.chooseTowns}...`} value="" onChange={(townId) => townId && addSubscriptionAction(townId)} />
                   </div>
                 </div>
               </Show>

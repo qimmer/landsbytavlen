@@ -1,7 +1,7 @@
 import { createAsync, useAction, useNavigate } from "@solidjs/router";
 import type { InferSelectModel } from "drizzle-orm";
-import { Show } from "solid-js";
-import type { organizations, towns } from "~/db/schema";
+import { createMemo, createSignal, Show } from "solid-js";
+import { organizations, towns } from "~/db/schema";
 import { createForm } from "~/lib/createForm";
 import { deleteImage } from "~/server/deleteImage";
 import { getImages } from "~/server/getImages";
@@ -18,6 +18,10 @@ import { FormTextArea } from "./form/FormTextArea";
 import { FormTextField } from "./form/FormTextField";
 import { Town } from "./Town";
 import { Button } from "./ui/button";
+import { groupBy, orderBy } from "lodash-es";
+import { TextFieldLabel, TextFieldRoot } from "./ui/textfield";
+import { VirtualSelect, VirtualSelectContent, VirtualSelectTrigger } from "./ui/virtual-select";
+import { FormTownSelect } from "./form/FormTownSelect";
 
 export function UpsertOrganization(props: {
   organization: InferSelectModel<typeof organizations>;
@@ -27,6 +31,9 @@ export function UpsertOrganization(props: {
 
   const allTowns = createAsync(() => getTowns());
   const images = createAsync(() => getImages());
+  const townsByMunicipality = createMemo(() => groupBy(allTowns() ?? [], "municipality"));
+  const municipalities = createMemo(() => orderBy(Object.keys(townsByMunicipality()), x => x));
+  const [municipality, setMunicipality] = createSignal("");
 
   const upsertOrganizationAction = useAction(upsertOrganization);
   const uploadImageAction = useAction(uploadImage);
@@ -44,7 +51,10 @@ export function UpsertOrganization(props: {
               ...form.result!,
               id: props.organization.id,
             });
-            navigate("/");
+
+            if (form.result?.id) {
+              navigate("/");
+            }
           }
         }}
       >
@@ -76,26 +86,27 @@ export function UpsertOrganization(props: {
 
         <FormTextField field={form.fields.vatId} label={t.vatId} required />
         <FormTextField field={form.fields.phone} label={t.phone} />
-        <FormSelect<InferSelectModel<typeof towns>>
+
+        <FormTownSelect
           field={form.fields.townId}
           label={t.town}
-          options={allTowns() ?? []}
-          optionTitle={(x) => <Town town={x} />}
-          optionValue={(x) => x.id}
           required
         />
 
-        <FormImage
-          label={t.image}
-          images={images()?.map((x) => x.id) ?? []}
-          field={form.fields.imageId}
-          onDelete={(imageId) => {
-            deleteImageAction(imageId);
-          }}
-          onUpload={async (file) => {
-            uploadImageAction(file);
-          }}
-        />
+        <Show when={!!props.organization.id}>
+          <FormImage
+            label={t.image}
+            images={images()?.map((x) => x.id) ?? []}
+            field={form.fields.imageId}
+            onDelete={(imageId) => {
+              deleteImageAction(imageId);
+            }}
+            onUpload={async (file) => {
+              uploadImageAction(file);
+            }}
+          />
+
+        </Show>
 
         <FormTextArea
           field={form.fields.presentation}
@@ -103,18 +114,21 @@ export function UpsertOrganization(props: {
           required
         />
 
-        <FormImage
-          label={t.presentationImages}
-          multiple
-          images={images()?.map((x) => x.id) ?? []}
-          field={form.fields.presentationImages}
-          onDelete={(imageId) => {
-            deleteImageAction(imageId);
-          }}
-          onUpload={async (file) => {
-            uploadImageAction(file);
-          }}
-        />
+        <Show when={!!props.organization.id}>
+          <FormImage
+            label={t.presentationImages}
+            multiple
+            images={images()?.map((x) => x.id) ?? []}
+            field={form.fields.presentationImages}
+            onDelete={(imageId) => {
+              deleteImageAction(imageId);
+            }}
+            onUpload={async (file) => {
+              uploadImageAction(file);
+            }}
+          />
+
+        </Show>
 
         <hr class="my-4" />
 

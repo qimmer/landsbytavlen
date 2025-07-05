@@ -49,6 +49,7 @@ export const t = {
   ],
   heroSubTitle: "Følg med i, hvad der sker i din by!",
   chooseTowns: "Vælg en eller flere byer at følge",
+  chooseMunicipality: "Vælg kommune",
   choose: "Vælg",
   addTown: "Tilføj by",
   add: "Tilføj",
@@ -66,5 +67,6 @@ export const t = {
   phoneFormat: "Telefon skal være 8 cifre med evt. +45 foran",
   presentation: "Præsentation",
   presentationImages: "Billeder til præsentation",
+  municipality: "Kommune",
   copyright: ({ year }: { year: string }) => `Copyright(C) ${year}, Kimatik`,
 };

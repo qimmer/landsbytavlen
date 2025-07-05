@@ -30,9 +30,9 @@ export const db = drizzle(pool, {
 });
 
 export const s3 = new Client({
-  endPoint: new URL(process.env.S3_ENDPOINT ?? "").hostname,
-  port: Number.parseInt(new URL(process.env.S3_ENDPOINT ?? "").port),
-  useSSL: false,
+  endPoint: process.env.S3_ENDPOINT ?? "",
+  port: process.env.S3_PORT ? Number.parseInt(process.env.S3_PORT) : undefined,
+  useSSL: process.env.S3_SSL === "true",
   accessKey: process.env.S3_ACCESS_KEY ?? "",
   secretKey: process.env.S3_SECRET_KEY ?? "",
   region: process.env.S3_REGION || undefined,

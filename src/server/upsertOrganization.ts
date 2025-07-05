@@ -7,6 +7,7 @@ import {
   type InferInput,
   length,
   maxLength,
+  minLength,
   nullable,
   object,
   optional,
@@ -23,14 +24,15 @@ import { t } from "~/t";
 import { getOrganization } from "./getOrganization";
 import { getRoles } from "./getRoles";
 import { getSession } from "./getSession";
+import { getOrganizations } from "./getOrganizations";
 
 export const organizationSchema = object({
   id: optional(pipe(string(), maxLength(64))),
   vatId: pipe(string(), length(8)),
-  townId: string(),
+  townId: pipe(string(), minLength(1)),
   phone: optional(nullable(danishPhoneNumber())),
   imageId: nullable(string()),
-  presentation: string(),
+  presentation: pipe(string(), minLength(1)),
   presentationImages: array(string()),
   deleted: optional(boolean()),
 });
@@ -40,7 +42,19 @@ export const defaultOrganizationInput = () =>
   ({
     vatId: "",
     townId: "",
-  }) as InferSelectModel<typeof organizations>;
+    imageId: null,
+    presentationImages: [],
+    address: "",
+    createdAt: new Date(),
+    createdBy: "",
+    deletedAt: null,
+    isCharity: false,
+    name: "",
+    phone: "",
+    postCode: "",
+    presentation: "",
+    updatedAt: new Date()
+  }) as Partial<InferSelectModel<typeof organizations>>;
 
 export const upsertOrganization = action(
   async (organization: UpsertOrganizationInput) => {
@@ -147,7 +161,8 @@ export const upsertOrganization = action(
 
     revalidate(getSession.key);
     revalidate(getRoles.key);
-    revalidate(getOrganization.keyFor(parsedOrganization.id!));
+    revalidate(getOrganization.key);
+    revalidate(getOrganizations.key);
   },
   "upsertOrganization",
 );
